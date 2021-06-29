@@ -8,13 +8,14 @@
 import Foundation
 
 protocol NetworkInfo {
-    func baseURl() -> String
+    //func baseURl() -> String
 }
 
 struct Network {
     
     //MARK: -  Onboarding
     enum Onboarding: NetworkInfo {
+        
         case login
         case signUp
         case resend_otp
@@ -24,18 +25,18 @@ struct Network {
         func rawValued() -> String {
             switch self {
             case .login:
-                return baseURl() + "userLogin"
+                return  "userLogin"
             case .signUp:
-                return baseURl() + "signUp"
+                return "signUp"
             case .resend_otp:
-                return baseURl() + "resend_otp"
+                return "resend_otp"
             case .logout:
-                return baseURl() + "logout"
+                return  "logout"
             case .apiCall(let val):
-                return baseURl() + "apiCall/\(val)"
+                return  "apiCall/\(val)"
             }
         }
-        func baseURl() -> String {
+        static func baseURl() -> String {
             return Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String ?? ""
         }
     }

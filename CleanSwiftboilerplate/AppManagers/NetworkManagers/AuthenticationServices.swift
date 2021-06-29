@@ -4,13 +4,25 @@
 import Foundation
 import UIKit
 
-class AuthenticationServices {
+protocol AuthenticationRepository {
+    func login(email: String, password: String, success: @escaping () -> Void,
+               failure: @escaping (_ error: Error) -> Void)
+    func signUp(_ email: String,
+                password: String,
+                avatar: UIImage,
+                success: @escaping (_ user: User?) -> Void,
+                failure: @escaping (_ error: Error) -> Void)
+}
+
+class AuthenticationServices: AuthenticationRepository {
+ 
+    var baseURL: String!
+    init() {
+        self.baseURL =  Network.Onboarding.baseURl()
+    }
     
-    class func login(_ email: String,
-                     password: String,
-                     success: @escaping () -> Void,
-                     failure: @escaping (_ error: Error) -> Void) {
-        let url = Network.Onboarding.login.rawValued()
+    func login(email: String, password: String, success: @escaping () -> Void, failure: @escaping (Error) -> Void) {
+        let url = self.baseURL + Network.Onboarding.login.rawValued()
         let parameters = [
             "user": [
                 "email": email,
@@ -27,11 +39,7 @@ class AuthenticationServices {
     
     //Multi part upload example
     //TODO: rails base backend not supporting multipart uploads yet
-    class func signup(_ email: String,
-                      password: String,
-                      avatar: UIImage,
-                      success: @escaping (_ user: User?) -> Void,
-                      failure: @escaping (_ error: Error) -> Void) {
+    func signUp(_ email: String, password: String, avatar: UIImage, success: @escaping (User?) -> Void, failure: @escaping (Error) -> Void) {
         let parameters = [
             "user": [
                 "email": email,
@@ -52,7 +60,7 @@ class AuthenticationServices {
         //Mixed base64 encoded and multipart images are supported in [MultipartMedia] param:
         //Example: let image2 = Base64Media(key: "user[image]", data: picData) Then: media [image, image2]
         APIClient.multipartRequest(
-            url: Network.Onboarding.login.rawValued(),
+            url: self.baseURL + Network.Onboarding.login.rawValued(),
             params: parameters,
             paramsRootKey: "",
             media: [image],
@@ -63,6 +71,7 @@ class AuthenticationServices {
             failure: failure
         )
     }
+    
     
     //Example method that uploads base64 encoded image.
     class func signup(_ email: String,
